@@ -8,6 +8,7 @@ struct Params
     FVector targetPosition;
     float max_velocity;
     float max_acceleration;
+    float dest_radius;
 };
 
 bool ReadParams(const char* filename, Params& params);

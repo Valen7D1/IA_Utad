@@ -4,13 +4,15 @@
 #include "AICharacter.h"
 #include "params/params.h"
 #include "debug/debugdraw.h"
+#include "steering.h"
 
 // Sets default values
 AAICharacter::AAICharacter()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	//m_steering = new SeekSteering();
+	m_steering = new ArriveSteering();
 }
 
 // Called when the game starts or when spawned
@@ -26,7 +28,7 @@ void AAICharacter::BeginPlay()
 // Called every frame
 void AAICharacter::Tick(float DeltaTime)
 {
-	m_velocity += steering->GetSteering(this, m_params) * DeltaTime;;
+	m_velocity += m_steering->GetSteering(this, m_params) * DeltaTime;;
 
 	if (m_velocity.Length()>200)
 	{
@@ -61,27 +63,4 @@ void AAICharacter::DrawDebug()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("%f"), m_velocity.Length()));
 	SetCircle(this, TEXT("targetPosition"), m_params.targetPosition, 50.f);
-}
-
-
-
-FVector SeekSteering::GetSteering(AAICharacter* player, Params playerParams)
-{
-	FVector desiredVelocity = playerParams.targetPosition - player->GetActorLocation();
-	desiredVelocity.Normalize();
-	desiredVelocity *= playerParams.max_velocity;
-
-	FVector newAcceleration = desiredVelocity - player->m_velocity;
-	newAcceleration.Normalize();
-	newAcceleration *= playerParams.max_acceleration;
-
-	DrawDebug(player, desiredVelocity, newAcceleration);
-
-	return newAcceleration;
-}
-
-void SeekSteering::DrawDebug(AAICharacter* player, FVector desiredVelocity, FVector acceleration)
-{
-	SetArrow(player, TEXT("linear_velocity"), desiredVelocity, 1000.f);
-	SetArrow(player, TEXT("linear_acceleration"), acceleration, 1000.f);
 }

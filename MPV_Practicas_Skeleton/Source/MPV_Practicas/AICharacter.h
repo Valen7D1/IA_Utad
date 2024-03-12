@@ -7,22 +7,10 @@
 #include "params/params.h"
 #include "GameFramework/PlayerController.h"
 
-
 #include "AICharacter.generated.h"
 
 
-class Steering
-{
-public:
-	virtual FVector GetSteering(AAICharacter* player, Params playerParams) = 0;
-};
-
-class SeekSteering : public Steering
-{
-public:
-	virtual FVector GetSteering(AAICharacter* player, Params playerParams) override;
-	void DrawDebug(AAICharacter* player, FVector desiredVelocity, FVector acceleration);
-};
+class steering;
 
 UCLASS()
 class MPV_PRACTICAS_API AAICharacter : public APawn
@@ -60,6 +48,6 @@ public:
 
 public:
 	FVector m_velocity;
-	Steering* steering = new SeekSteering();
+	steering* m_steering = nullptr;
 };
 
