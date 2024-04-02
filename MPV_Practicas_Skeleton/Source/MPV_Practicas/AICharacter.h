@@ -51,6 +51,7 @@ public:
 	
 	const Params& GetParams() const { return m_params; }
 
+	void CollisionManager(float DeltaTime);
 	void SelectNextPathPosition(float DeltaTime);
 	void MoveCharacter(float DeltaTime);
 	void RotateCharacter(float DeltaTime);

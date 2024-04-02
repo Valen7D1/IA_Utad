@@ -159,3 +159,55 @@ bool ReadPath(const char* filename, Params& params)
 	
 	return true;
 }
+
+bool ReadObstacles(const char* filename, Params& params)
+{
+	FString CurrentDirectory = FPlatformProcess::GetCurrentWorkingDirectory();
+
+	// Log or use the current working directory
+	UE_LOG(LogTemp, Log, TEXT("Current working directory: %s"), *CurrentDirectory);
+
+	FString ContentFolderDir = FPaths::ProjectContentDir();
+
+	//FString FilePath(TEXT("./params.xml"));
+	FString params_path = filename;
+	FString FilePath = FPaths::Combine(*ContentFolderDir, *params_path);
+	UE_LOG(LogTemp, Log, TEXT("Obstacles Path: %s"), *FilePath);
+
+	
+	FXmlFile MyXml(FilePath, EConstructMethod::ConstructFromFile);
+	
+	if (MyXml.GetRootNode())
+	{
+		const FXmlNode* RootNode = MyXml.GetRootNode();
+	
+		const FString MyChildTag("obstacles");
+		const FXmlNode* MyPoints = RootNode->FindChildNode(MyChildTag);
+			
+		TArray<FXmlNode*> Points = MyPoints->GetChildrenNodes();
+
+		FVector temp = FVector::Zero();
+		FString value;
+		for (FXmlNode* Node: Points)
+		{
+			value = Node->GetAttribute("x");
+			float x;
+			FDefaultValueHelper::ParseFloat(value, x);
+			temp.X = x;
+			
+			value = Node->GetAttribute("y");
+			float y;
+			FDefaultValueHelper::ParseFloat(value, y);
+			temp.Z = y;
+			
+			value = Node->GetAttribute("r");
+			float r;
+			FDefaultValueHelper::ParseFloat(value, r);
+			temp.Y = r;
+
+			params.obstacles.Add(temp);
+		}
+	}
+	
+	return true;
+}

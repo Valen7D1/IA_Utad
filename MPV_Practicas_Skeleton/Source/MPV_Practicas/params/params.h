@@ -16,9 +16,11 @@ struct Params
     float targetRotation;
 
     TArray<FVector> path;
+    TArray<FVector> obstacles;
 };
 
 bool ReadParams(const char* filename, Params& params);
 bool ReadPath(const char* filename, Params& params);
+bool ReadObstacles(const char* filename, Params& params);
 
 #endif

@@ -26,6 +26,7 @@ void AAICharacter::BeginPlay()
 
 	ReadParams("params.xml", m_params);
 	ReadPath("path.xml", m_params);
+	ReadObstacles("obstacles.xml", m_params);
 }
 
 // Called every frame
@@ -64,6 +65,11 @@ void AAICharacter::OnClickedRight(const FVector& mousePosition)
 	m_params.targetRotation = angle;
 }
 
+
+void AAICharacter::CollisionManager(float DeltaTime)
+{
+	// first check if its colliding with anything
+}
 
 void AAICharacter::SelectNextPathPosition(float DeltaTime)
 {
@@ -161,7 +167,15 @@ void AAICharacter::DrawDebug()
 
 	SetPath(this, TEXT("follow_path"), TEXT("path"), m_params.path, 5.0f, PathMaterial);
 
-	//SetCircle(this, TEXT("targetPosition"), m_params.targetPosition, 20.0f);
+	// perdon por este draw debug que voy a hacer pero sinceramente la vida es dura
+	TArray<FString> ObstaclesArray; ObstaclesArray.Add(FString("Obstacle1")); ObstaclesArray.Add(FString("Obstacle2"));
+	for (int i = 0; i < m_params.obstacles.Num(); ++i)
+	{
+		FVector temp = m_params.obstacles[i];
+		float radius = temp.Y;
+		temp.Y = 0.f;
+		SetCircle(this, ObstaclesArray[i], temp, radius);
+	}
 	FVector dir(cos(FMath::DegreesToRadians(m_params.targetRotation)), 0.0f, sin(FMath::DegreesToRadians(m_params.targetRotation)));
 	SetArrow(this, TEXT("targetRotation"), dir, 80.0f);
 }
