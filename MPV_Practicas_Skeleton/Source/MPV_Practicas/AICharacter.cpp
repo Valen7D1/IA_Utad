@@ -12,8 +12,8 @@ AAICharacter::AAICharacter()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	//m_steering = new SeekSteering();
-	m_steering = new ArriveSteering();
+	m_steering = new SeekSteering();
+	//m_steering = new ArriveSteering();
 	m_angularSteering = new AllignSteering();
 }
 
@@ -33,8 +33,8 @@ void AAICharacter::Tick(float DeltaTime)
 {
 	MoveCharacter(DeltaTime);
 	RotateCharacter(DeltaTime);
-
-	GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("[%f, %f]"),current_angle , m_params.targetRotation));
+	
+	//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("[%f, %f]"),current_angle , m_params.targetRotation));
 
 	Super::Tick(DeltaTime);
 
@@ -70,18 +70,28 @@ void AAICharacter::SelectNextPathPosition(float DeltaTime)
 	int SegmentId = 0;
 	float ClosestDistance = MAX_FLT;
 	float TempDistance = MAX_FLT;
+	FVector Winner = FVector::Zero();
+	FVector WinnerDirection = FVector::Zero();
 	
-	for (int i = 0; i<m_params.path.Num()-1; ++i)
+	for (int i = 0; i<m_params.path.Num(); ++i)
 	{
 		FVector MyLocation = GetActorLocation();
 		FVector FirstPoint = m_params.path[i];
-		FVector SecondPoint = m_params.path[i+1];
+		FVector SecondPoint = FVector::Zero();
+		if (i + 1 == m_params.path.Num())
+		{
+			SecondPoint = m_params.path[0];
+		}
+		else
+		{
+			SecondPoint = m_params.path[i+1];
+		}
 		
 		FVector SegmentVector = SecondPoint - FirstPoint;
 		FVector AP = MyLocation - FirstPoint;
 		
-		float lengthSqrAB = SegmentVector.X * SegmentVector.X + SegmentVector.Y * SegmentVector.Y;
-		float t = (AP.X * SegmentVector.X + AP.Y * SegmentVector.Y) / lengthSqrAB;
+		float lengthSqrAB = SegmentVector.X * SegmentVector.X + SegmentVector.Z * SegmentVector.Z;
+		float t = (AP.X * SegmentVector.X + AP.Z * SegmentVector.Z) / lengthSqrAB;
 
 		if(t < 0) { t = 0; }
 		if(t > 1) { t = 1; }
@@ -92,8 +102,29 @@ void AAICharacter::SelectNextPathPosition(float DeltaTime)
 		{
 			ClosestDistance = TempDistance;
 			SegmentId = i;
+			Winner = Final;
+			WinnerDirection = SegmentVector;
 		}
 	}
+	//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("[%f, %f]"), Winner.X, Winner.Z ));
+	SetCircle(this, TEXT("targetPosition"), Winner, 20.0f);
+
+	if (SegmentId + 1 == m_params.path.Num())
+	{
+		m_params.targetPosition = m_params.path[0];
+	}
+	else
+	{
+		m_params.targetPosition = m_params.path[SegmentId+1];
+	}
+
+	FVector dir = (m_params.targetPosition - GetActorLocation()).GetSafeNormal();
+	float angle = FMath::RadiansToDegrees(atan2(dir.Z, dir.X));
+	m_params.targetRotation = angle;
+	
+	// WinnerDirection.Normalize();
+	// m_params.targetPosition = Winner + WinnerDirection * m_params.max_velocity * DeltaTime;
+	
 }
 
 void AAICharacter::MoveCharacter(float DeltaTime)
@@ -130,7 +161,7 @@ void AAICharacter::DrawDebug()
 
 	SetPath(this, TEXT("follow_path"), TEXT("path"), m_params.path, 5.0f, PathMaterial);
 
-	SetCircle(this, TEXT("targetPosition"), m_params.targetPosition, 20.0f);
+	//SetCircle(this, TEXT("targetPosition"), m_params.targetPosition, 20.0f);
 	FVector dir(cos(FMath::DegreesToRadians(m_params.targetRotation)), 0.0f, sin(FMath::DegreesToRadians(m_params.targetRotation)));
 	SetArrow(this, TEXT("targetRotation"), dir, 80.0f);
 }
