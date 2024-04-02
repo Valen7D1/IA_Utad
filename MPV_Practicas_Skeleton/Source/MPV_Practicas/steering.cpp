@@ -5,7 +5,10 @@
 #include "params/params.h"
 #include "debug/debugdraw.h"
 #include "AICharacter.h"
+#include "util.h"
 
+
+/////////////////////////// SEEK STEERING ///////////////////////////////////////////////////////
 
 FVector SeekSteering::GetSteering(AAICharacter* player, Params playerParams)
 {
@@ -29,6 +32,7 @@ void SeekSteering::DrawDebug(AAICharacter* player, FVector desiredVelocity, FVec
 }
 
 
+/////////////////////////// ARRIVE STEERING /////////////////////////////////////////////////////
 
 FVector ArriveSteering::GetSteering(AAICharacter* player, Params playerParams)
 {
@@ -58,5 +62,30 @@ void ArriveSteering::DrawDebug(AAICharacter* player, FVector desiredVelocity, FV
 {
 	SetArrow(player, TEXT("linear_velocity"), desiredVelocity, 1000.f);
 	SetArrow(player, TEXT("linear_acceleration"), acceleration, 1000.f);
+}
+
+
+/////////////////////////// ALLIGN STEERING /////////////////////////////////////////////////////
+
+FVector AllignSteering::GetSteering(AAICharacter* player, Params playerParams)
+{
+
+	float desiredAngularVelocity = convertTo180(playerParams.targetRotation - player->current_angle);
+
+	float velocityModifier = 1;
+	if (fabs(desiredAngularVelocity) < playerParams.angular_arrive_radius)
+	{
+		velocityModifier = fabs(desiredAngularVelocity / playerParams.angular_arrive_radius);
+	}
+	//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("[%f, %f]"), fabs(desiredAngularVelocity), velocityModifier));
+	desiredAngularVelocity *= velocityModifier;
+
+	float newAcceleration = convertTo180(desiredAngularVelocity - player->m_angularVelocity);
+	newAcceleration *= playerParams.max_acceleration;
+
+	if (newAcceleration > playerParams.max_angular_acceleration) { newAcceleration = playerParams.max_angular_acceleration; }
+	if (newAcceleration < -playerParams.max_angular_acceleration) { newAcceleration = -playerParams.max_angular_acceleration; }
+
+	return FVector(newAcceleration, 0.f, 0.f);
 }
 

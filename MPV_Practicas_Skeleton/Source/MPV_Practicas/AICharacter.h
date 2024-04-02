@@ -25,6 +25,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AIChar)
 	uint32 bDoMovement : 1;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AIChar)
+		float current_angle;
+
+	UPROPERTY(EditAnywhere)
+		UMaterialInterface* PathMaterial;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -44,10 +50,19 @@ public:
 	
 	const Params& GetParams() const { return m_params; }
 
+	void MoveCharacter(float DeltaTime);
+	void RotateCharacter(float DeltaTime);
+
+	float GetActorAngle() const;
+	void SetActorAngle(float angle);
+
 	void DrawDebug();
 
 public:
 	FVector m_velocity;
+	float m_angularVelocity;
+
 	steering* m_steering = nullptr;
+	steering* m_angularSteering = nullptr;
 };
 

@@ -1,0 +1,14 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\gonzalo.valenti\\documents\\miscosas\\ia_utad\\mpv_practicas_skeleton\\source\\mpv_practicas\\mpv_practicas.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\users\\gonzalo.valenti\\documents\\miscosas\\ia_utad\\mpv_practicas_skeleton\\intermediate\\build\\win64\\x64\\mpv_practicaseditor\\development\\unrealed\\sharedpch.unrealed.cpp20.h.pch",
+        "Includes": [
+            "c:\\users\\gonzalo.valenti\\documents\\miscosas\\ia_utad\\mpv_practicas_skeleton\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\mpv_practicas\\definitions.mpv_practicas.h",
+            "c:\\users\\gonzalo.valenti\\documents\\miscosas\\ia_utad\\mpv_practicas_skeleton\\source\\mpv_practicas\\mpv_practicas.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

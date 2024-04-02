@@ -5,6 +5,9 @@
 #include "Components/ArrowComponent.h"
 #include "Math/Color.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "ProceduralMeshComponent.h"
+#include "PaperSpriteActor.h"
+#include "PaperSpriteComponent.h"
 
 
 UActorComponent* GetComponentByName(const AActor* Actor, FName ComponentName)
@@ -116,5 +119,77 @@ void SetArrow(const AActor* owner, const FString& arrow_name, const FVector& dir
         ArrowComponent->ArrowLength = length;
 
         ArrowComponent->SetArrowColor(ArrowComponent->ArrowColor); // Force Update
+    }
+}
+
+void SetPath(const AActor* owner, const FString& path_actor_name, const FString& path_name, const TArray<FVector>& PathPoints, float PathThickness, UMaterialInterface* material)
+{
+    // Check if we have enough points to create the path
+    if (PathPoints.Num() < 2)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Path must contain at least two points"));
+        return;
+    }
+
+    AActor* path_actor = GetActorByLabel(owner, path_actor_name);
+    if (!path_actor)
+        return;
+    // Get Component
+    UActorComponent* ActorComponent = GetComponentByName(path_actor, FName(path_name));
+    UProceduralMeshComponent* ProceduralMeshComponent = Cast<UProceduralMeshComponent>(ActorComponent);
+
+    if (ProceduralMeshComponent)
+    {
+        // Arrays to hold mesh data
+        TArray<FVector> Vertices;
+        TArray<int32> Triangles;
+        TArray<FVector> Normals;
+        TArray<FVector2D> UVs;
+
+        // Generate vertices, triangles, normals, and UVs
+        for (int32 i = 0; i < PathPoints.Num(); ++i)
+        {
+            // Get current and next points
+            FVector CurrentPoint = PathPoints[i];
+            FVector NextPoint = PathPoints[(i + 1) % PathPoints.Num()];
+
+            // Calculate direction vector and perpendicular vector
+            FVector Direction = (NextPoint - CurrentPoint).GetSafeNormal();
+            FVector Perpendicular = FVector::CrossProduct(Direction, FVector::YAxisVector).GetSafeNormal();
+
+            // Calculate vertices for outer edge of path
+            FVector OuterTop = CurrentPoint + (Perpendicular * (PathThickness / 2));
+            FVector OuterBottom = CurrentPoint - (Perpendicular * (PathThickness / 2));
+
+            // Calculate vertices for inner edge of path
+            FVector InnerTop = NextPoint + (Perpendicular * (PathThickness / 2));
+            FVector InnerBottom = NextPoint - (Perpendicular * (PathThickness / 2));
+
+            // Add vertices
+            Vertices.Add(OuterTop);
+            Vertices.Add(OuterBottom);
+            Vertices.Add(InnerBottom);
+            Vertices.Add(InnerTop);
+
+            // Calculate UVs and normals (for simplicity, UVs and normals are calculated per vertex)
+            for (int32 j = 0; j < 4; ++j)
+            {
+                UVs.Add(FVector2D((float)j / 4, 0)); // Linear UV mapping along path
+                Normals.Add(Direction); // Use the same normal for all vertices
+            }
+
+            // Add triangles
+            int32 StartIndex = i * 4;
+            Triangles.Add(StartIndex);
+            Triangles.Add(StartIndex + 1);
+            Triangles.Add(StartIndex + 2);
+            Triangles.Add(StartIndex);
+            Triangles.Add(StartIndex + 2);
+            Triangles.Add(StartIndex + 3);
+        }
+
+        // Create mesh section
+        ProceduralMeshComponent->CreateMeshSection(0, Vertices, Triangles, Normals, UVs, TArray<FColor>(), TArray<FProcMeshTangent>(), false);
+        ProceduralMeshComponent->SetMaterial(0, material);
     }
 }
