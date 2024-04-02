@@ -7,7 +7,7 @@
 #include "steering.h"
 #include "util.h"
 
-// Sets default values
+
 AAICharacter::AAICharacter()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -17,7 +17,7 @@ AAICharacter::AAICharacter()
 	m_angularSteering = new AllignSteering();
 }
 
-// Called when the game starts or when spawned
+
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -29,9 +29,10 @@ void AAICharacter::BeginPlay()
 	ReadObstacles("obstacles.xml", m_params);
 }
 
-// Called every frame
+
 void AAICharacter::Tick(float DeltaTime)
 {
+	CollisionManager(DeltaTime);
 	MoveCharacter(DeltaTime);
 	RotateCharacter(DeltaTime);
 	
@@ -42,7 +43,7 @@ void AAICharacter::Tick(float DeltaTime)
 	DrawDebug();
 }
 
-// Called to bind functionality to input
+
 void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -69,6 +70,41 @@ void AAICharacter::OnClickedRight(const FVector& mousePosition)
 void AAICharacter::CollisionManager(float DeltaTime)
 {
 	// first check if its colliding with anything
+	FVector Winner = FVector(FLT_MAX);
+	float WinnerDist = FLT_MAX;
+
+	FVector ActorLocation = GetActorLocation();
+	FVector AheadPosition = m_params.targetPosition - GetActorLocation();
+	AheadPosition.Normalize();
+	AheadPosition *= m_params.look_ahead;
+	AheadPosition += GetActorLocation();
+	
+	for (FVector const Obstacle : m_params.obstacles)
+	{
+		// set values because i use FVector pocho
+		FVector ObstacleLocation = Obstacle;
+		float ObstacleRadius = Obstacle.Y;
+		ObstacleLocation.Y = 0.f;
+		
+		// if distance of projected location is lower than radius of both obstacle and player
+		float const Distance = FVector::Dist(AheadPosition, ObstacleLocation);
+
+		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("Distance: %f"), Distance ));
+		if (Distance < (ObstacleRadius + m_radius) && Distance < WinnerDist)
+		{
+			WinnerDist = Distance;
+			Winner = ObstacleLocation;
+		}
+	}
+	
+	if (WinnerDist < FLT_MAX)
+	{
+		// Add acceleration in perpendicular direction
+		FVector AvoidanceAcceleration = AheadPosition - Winner;
+		AvoidanceAcceleration.Normalize();
+		AvoidanceAcceleration *= m_params.max_acceleration * DeltaTime;
+		m_velocity += AvoidanceAcceleration;
+	}
 }
 
 void AAICharacter::SelectNextPathPosition(float DeltaTime)
@@ -194,6 +230,7 @@ float AAICharacter::GetActorAngle() const
 	axisAngle = convertTo360(axisAngle);
 	return axisAngle;
 }
+
 
 void AAICharacter::SetActorAngle(float angle)
 { 

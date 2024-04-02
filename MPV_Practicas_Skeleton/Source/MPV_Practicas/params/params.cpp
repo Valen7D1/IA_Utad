@@ -37,7 +37,6 @@ bool ReadParams(const char* filename, Params& params)
 		{
 			value = paramElem->GetAttribute("value");
 			FDefaultValueHelper::ParseFloat(value, params.max_velocity);
-
 		}
 
 		// max_acceleration
@@ -46,7 +45,6 @@ bool ReadParams(const char* filename, Params& params)
 		{
 			value = paramElem->GetAttribute("value");
 			FDefaultValueHelper::ParseFloat(value, params.max_acceleration);
-
 		}
 
 		// dest_radius
@@ -55,7 +53,6 @@ bool ReadParams(const char* filename, Params& params)
 		{
 			value = paramElem->GetAttribute("value");
 			FDefaultValueHelper::ParseFloat(value, params.dest_radius);
-
 		}
 
 		// max_angular_velocity
@@ -64,7 +61,6 @@ bool ReadParams(const char* filename, Params& params)
 		{
 			value = paramElem->GetAttribute("value");
 			FDefaultValueHelper::ParseFloat(value, params.max_angular_velocity);
-
 		}
 
 		// max_angular_acceleration
@@ -73,7 +69,6 @@ bool ReadParams(const char* filename, Params& params)
 		{
 			value = paramElem->GetAttribute("value");
 			FDefaultValueHelper::ParseFloat(value, params.max_angular_acceleration);
-
 		}
 
 		// angular_arrive_radius
@@ -82,7 +77,6 @@ bool ReadParams(const char* filename, Params& params)
 		{
 			value = paramElem->GetAttribute("value");
 			FDefaultValueHelper::ParseFloat(value, params.angular_arrive_radius);
-
 		}
 
 		// targetRotation
@@ -91,7 +85,14 @@ bool ReadParams(const char* filename, Params& params)
 		{
 			value = paramElem->GetAttribute("value");
 			FDefaultValueHelper::ParseFloat(value, params.targetRotation);
+		}
 
+		// look_ahead
+		paramElem = MyChildNode->FindChildNode(TEXT("look_ahead"));
+		if (paramElem)
+		{
+			value = paramElem->GetAttribute("value");
+			FDefaultValueHelper::ParseFloat(value, params.look_ahead);
 		}
 
 

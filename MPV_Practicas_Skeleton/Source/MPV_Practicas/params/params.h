@@ -15,6 +15,8 @@ struct Params
     float angular_arrive_radius;
     float targetRotation;
 
+    float look_ahead;
+
     TArray<FVector> path;
     TArray<FVector> obstacles;
 };

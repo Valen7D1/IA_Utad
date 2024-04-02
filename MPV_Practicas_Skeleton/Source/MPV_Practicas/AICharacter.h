@@ -26,6 +26,9 @@ public:
 	uint32 bDoMovement : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AIChar)
+	float m_radius = 50.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AIChar)
 		float current_angle;
 
 	UPROPERTY(EditAnywhere)
