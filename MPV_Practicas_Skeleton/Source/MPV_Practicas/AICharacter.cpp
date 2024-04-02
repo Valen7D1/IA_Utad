@@ -25,6 +25,7 @@ void AAICharacter::BeginPlay()
 	m_velocity = FVector(0.f);
 
 	ReadParams("params.xml", m_params);
+	ReadPath("path.xml", m_params);
 }
 
 // Called every frame
@@ -64,8 +65,42 @@ void AAICharacter::OnClickedRight(const FVector& mousePosition)
 }
 
 
+void AAICharacter::SelectNextPathPosition(float DeltaTime)
+{
+	int SegmentId = 0;
+	float ClosestDistance = MAX_FLT;
+	float TempDistance = MAX_FLT;
+	
+	for (int i = 0; i<m_params.path.Num()-1; ++i)
+	{
+		FVector MyLocation = GetActorLocation();
+		FVector FirstPoint = m_params.path[i];
+		FVector SecondPoint = m_params.path[i+1];
+		
+		FVector SegmentVector = SecondPoint - FirstPoint;
+		FVector AP = MyLocation - FirstPoint;
+		
+		float lengthSqrAB = SegmentVector.X * SegmentVector.X + SegmentVector.Y * SegmentVector.Y;
+		float t = (AP.X * SegmentVector.X + AP.Y * SegmentVector.Y) / lengthSqrAB;
+
+		if(t < 0) { t = 0; }
+		if(t > 1) { t = 1; }
+
+		FVector Final = FirstPoint + t * SegmentVector;
+
+		if ((TempDistance = FVector::Dist(MyLocation, Final)) < ClosestDistance)
+		{
+			ClosestDistance = TempDistance;
+			SegmentId = i;
+		}
+	}
+}
+
 void AAICharacter::MoveCharacter(float DeltaTime)
 {
+
+	SelectNextPathPosition(DeltaTime);
+	
 	m_velocity += m_steering->GetSteering(this, m_params) * DeltaTime;;
 
 	if (m_velocity.Length() > m_params.max_velocity)
@@ -91,16 +126,9 @@ void AAICharacter::RotateCharacter(float DeltaTime)
 
 void AAICharacter::DrawDebug()
 {
-	TArray<FVector> Points =
-	{
-		FVector(0.f, 0.f, 0.f),
-		FVector(100.f, 0.f, 0.f),
-		FVector(100.f, 0.f, 100.f),
-		FVector(100.f, 0.f, 100.f),
-		FVector(0.f, 0.f, 100.f)
-	};
+	TArray<FVector> Points = m_params.path;
 
-	SetPath(this, TEXT("follow_path"), TEXT("path"), Points, 5.0f, PathMaterial);
+	SetPath(this, TEXT("follow_path"), TEXT("path"), m_params.path, 5.0f, PathMaterial);
 
 	SetCircle(this, TEXT("targetPosition"), m_params.targetPosition, 20.0f);
 	FVector dir(cos(FMath::DegreesToRadians(m_params.targetRotation)), 0.0f, sin(FMath::DegreesToRadians(m_params.targetRotation)));

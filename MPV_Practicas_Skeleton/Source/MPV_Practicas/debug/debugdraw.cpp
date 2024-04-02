@@ -136,6 +136,7 @@ void SetPath(const AActor* owner, const FString& path_actor_name, const FString&
         return;
     // Get Component
     UActorComponent* ActorComponent = GetComponentByName(path_actor, FName(path_name));
+    ActorComponent->GetOwner()->SetActorLocation(FVector::ZeroVector);
     UProceduralMeshComponent* ProceduralMeshComponent = Cast<UProceduralMeshComponent>(ActorComponent);
 
     if (ProceduralMeshComponent)

@@ -4,9 +4,13 @@
 		<max_acceleration value="2000"> </max_acceleration>
 		<dest_radius value="50"> </dest_radius>
 		<targetPosition x="40" z="30"> </targetPosition>
+		
 		<max_angular_velocity value="2"> </max_angular_velocity>
 		<max_angular_acceleration value="2000"> </max_angular_acceleration>
 		<angular_arrive_radius value="1"> </angular_arrive_radius>
 		<targetRotation value="360"> </targetRotation>
+		
+		<look_ahead value="40"></look_ahead>
+		<time_ahead value="4"></time_ahead>
 	</params>
 </root>

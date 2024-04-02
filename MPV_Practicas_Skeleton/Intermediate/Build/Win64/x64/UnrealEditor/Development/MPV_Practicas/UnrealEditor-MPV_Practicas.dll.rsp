@@ -50,6 +50,8 @@
 "..\Intermediate\Build\Win64\x64\UnrealEditor\Development\Core\UnrealEditor-Core.lib"
 "..\Intermediate\Build\Win64\x64\UnrealEditor\Development\CoreUObject\UnrealEditor-CoreUObject.lib"
 "..\Intermediate\Build\Win64\x64\UnrealEditor\Development\InputCore\UnrealEditor-InputCore.lib"
+"..\Plugins\2D\Paper2D\Intermediate\Build\Win64\x64\UnrealEditor\Development\Paper2D\UnrealEditor-Paper2D.lib"
+"..\Plugins\Runtime\ProceduralMeshComponent\Intermediate\Build\Win64\x64\UnrealEditor\Development\ProceduralMeshComponent\UnrealEditor-ProceduralMeshComponent.lib"
 "delayimp.lib"
 "wininet.lib"
 "rpcrt4.lib"

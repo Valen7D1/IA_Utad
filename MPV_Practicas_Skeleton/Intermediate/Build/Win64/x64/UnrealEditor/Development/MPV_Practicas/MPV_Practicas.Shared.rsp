@@ -259,6 +259,11 @@
 /I "Runtime\XmlParser\Public"
 /I "C:\Users\gonzalo.valenti\Documents\MisCosas\IA_Utad\MPV_Practicas_Skeleton\Intermediate\Build\Win64\UnrealEditor\Inc\MPV_Practicas\UHT"
 /I "C:\Users\gonzalo.valenti\Documents\MisCosas\IA_Utad\MPV_Practicas_Skeleton\Source"
+/I "..\Plugins\2D\Paper2D\Intermediate\Build\Win64\UnrealEditor\Inc\Paper2D\UHT"
+/I "..\Plugins\2D\Paper2D\Source\Paper2D\Classes"
+/I "..\Plugins\2D\Paper2D\Source\Paper2D\Public"
+/I "..\Plugins\Runtime\ProceduralMeshComponent\Intermediate\Build\Win64\UnrealEditor\Inc\ProceduralMeshComponent\UHT"
+/I "..\Plugins\Runtime\ProceduralMeshComponent\Source\ProceduralMeshComponent\Public"
 /external:W0
 /external:I "ThirdParty\mimalloc\include"
 /external:I "ThirdParty\LibTiff\Source\Win64"

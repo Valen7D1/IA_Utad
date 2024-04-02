@@ -15,8 +15,10 @@ struct Params
     float angular_arrive_radius;
     float targetRotation;
 
+    TArray<FVector> path;
 };
 
 bool ReadParams(const char* filename, Params& params);
+bool ReadPath(const char* filename, Params& params);
 
 #endif

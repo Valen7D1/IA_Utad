@@ -45,11 +45,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "AIFunctions")
 	void OnClickedLeft(const FVector& mousePosition);
+	
 	UFUNCTION(BlueprintCallable, Category = "AIFunctions")
 	void OnClickedRight(const FVector& mousePosition);
 	
 	const Params& GetParams() const { return m_params; }
 
+	void SelectNextPathPosition(float DeltaTime);
 	void MoveCharacter(float DeltaTime);
 	void RotateCharacter(float DeltaTime);
 
