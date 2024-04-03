@@ -12,8 +12,8 @@ AAICharacter::AAICharacter()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	m_steering = new SeekSteering();
-	//m_steering = new ArriveSteering();
+	//m_steering = new SeekSteering();
+	m_steering = new ArriveSteering();
 	m_angularSteering = new AllignSteering();
 }
 
@@ -77,7 +77,7 @@ void AAICharacter::CollisionManager(float DeltaTime)
 	FVector AheadPosition = m_params.targetPosition - GetActorLocation();
 	AheadPosition.Normalize();
 
-	SetArrow(this, TEXT("linear_velocity"), AheadPosition, 8000.f);
+	//SetArrow(this, TEXT("linear_velocity"), AheadPosition, 8000.f);
 	
 	AheadPosition = GetActorLocation() + AheadPosition * m_params.look_ahead;
 	
@@ -93,7 +93,7 @@ void AAICharacter::CollisionManager(float DeltaTime)
 		
 		if (Distance < (ObstacleRadius + m_radius) && Distance < WinnerDist)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("Distance: %f"), Distance ));
+			//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("Distance: %f"), Distance ));
 			WinnerDist = Distance;
 			Winner = ObstacleLocation;
 		}
@@ -178,7 +178,7 @@ void AAICharacter::SelectNextPathPosition(float DeltaTime)
 void AAICharacter::MoveCharacter(float DeltaTime)
 {
 
-	SelectNextPathPosition(DeltaTime);
+	//SelectNextPathPosition(DeltaTime);
 	
 	m_velocity += m_steering->GetSteering(this, m_params) * DeltaTime;;
 
