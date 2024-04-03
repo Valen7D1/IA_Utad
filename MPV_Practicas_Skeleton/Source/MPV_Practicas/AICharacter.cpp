@@ -76,8 +76,10 @@ void AAICharacter::CollisionManager(float DeltaTime)
 	FVector ActorLocation = GetActorLocation();
 	FVector AheadPosition = m_params.targetPosition - GetActorLocation();
 	AheadPosition.Normalize();
-	AheadPosition *= m_params.look_ahead;
-	AheadPosition += GetActorLocation();
+
+	SetArrow(this, TEXT("linear_velocity"), AheadPosition, 8000.f);
+	
+	AheadPosition = GetActorLocation() + AheadPosition * m_params.look_ahead;
 	
 	for (FVector const Obstacle : m_params.obstacles)
 	{
@@ -88,10 +90,10 @@ void AAICharacter::CollisionManager(float DeltaTime)
 		
 		// if distance of projected location is lower than radius of both obstacle and player
 		float const Distance = FVector::Dist(AheadPosition, ObstacleLocation);
-
-		GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("Distance: %f"), Distance ));
+		
 		if (Distance < (ObstacleRadius + m_radius) && Distance < WinnerDist)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("Distance: %f"), Distance ));
 			WinnerDist = Distance;
 			Winner = ObstacleLocation;
 		}
@@ -99,11 +101,15 @@ void AAICharacter::CollisionManager(float DeltaTime)
 	
 	if (WinnerDist < FLT_MAX)
 	{
-		// Add acceleration in perpendicular direction
-		FVector AvoidanceAcceleration = AheadPosition - Winner;
-		AvoidanceAcceleration.Normalize();
-		AvoidanceAcceleration *= m_params.max_acceleration * DeltaTime;
-		m_velocity += AvoidanceAcceleration;
+		FVector RO = Winner - GetActorLocation();
+		FVector Diff = AheadPosition - Winner;
+
+		FVector RO_Diff = FVector::CrossProduct(RO, Diff);
+		FVector Final = FVector::CrossProduct(RO_Diff, RO);
+
+		Final.Normalize();
+		
+		m_velocity += Final * m_params.max_acceleration * DeltaTime * 1.3f;
 	}
 }
 
@@ -213,7 +219,9 @@ void AAICharacter::DrawDebug()
 		SetCircle(this, ObstaclesArray[i], temp, radius);
 	}
 	FVector dir(cos(FMath::DegreesToRadians(m_params.targetRotation)), 0.0f, sin(FMath::DegreesToRadians(m_params.targetRotation)));
-	SetArrow(this, TEXT("targetRotation"), dir, 80.0f);
+	//SetArrow(this, TEXT("targetRotation"), dir, 80.0f);
+
+	SetCircle(this, "targetPosition", m_params.targetPosition, 20.f);
 }
 
 

@@ -27,8 +27,8 @@ FVector SeekSteering::GetSteering(AAICharacter* player, Params playerParams)
 
 void SeekSteering::DrawDebug(AAICharacter* player, FVector desiredVelocity, FVector acceleration)
 {
-	SetArrow(player, TEXT("linear_velocity"), desiredVelocity, 1000.f);
-	SetArrow(player, TEXT("linear_acceleration"), acceleration, 1000.f);
+	// SetArrow(player, TEXT("linear_velocity"), desiredVelocity, 1000.f);
+	// SetArrow(player, TEXT("linear_acceleration"), acceleration, 1000.f);
 }
 
 
@@ -60,8 +60,8 @@ FVector ArriveSteering::GetSteering(AAICharacter* player, Params playerParams)
 
 void ArriveSteering::DrawDebug(AAICharacter* player, FVector desiredVelocity, FVector acceleration)
 {
-	SetArrow(player, TEXT("linear_velocity"), desiredVelocity, 1000.f);
-	SetArrow(player, TEXT("linear_acceleration"), acceleration, 1000.f);
+	// SetArrow(player, TEXT("linear_velocity"), desiredVelocity, 1000.f);
+	// SetArrow(player, TEXT("linear_acceleration"), acceleration, 1000.f);
 }
 
 

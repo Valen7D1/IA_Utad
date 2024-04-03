@@ -3,8 +3,8 @@
 		<point x="-200" y="-200"></point>
 		<point x="-100" y="0"></point>
 		<point x="100" y="150"></point>
-		<point x="250" y="100"></point>
-		<point x="300" y="-100"></point>
-		<point x="225" y="-250"></point>
+		<point x="600" y="100"></point>
+		<point x="600" y="-100"></point>
+		<point x="300" y="-200"></point>
 	</points>
 </root>
