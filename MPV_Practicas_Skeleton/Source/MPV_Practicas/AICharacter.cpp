@@ -7,6 +7,7 @@
 #include "steering.h"
 #include "util.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "pathfinding/astar.h"
 
 
 AAICharacter::AAICharacter()
@@ -25,12 +26,20 @@ void AAICharacter::BeginPlay()
 
 	m_velocity = FVector(0.f);
 
-	ReadParams("params.xml", m_params);
-	ReadPath("path.xml", m_params);
-	ReadObstacles("obstacles.xml", m_params);
-
 	const FString FilePath = FPaths::ProjectContentDir() + TEXT("Grid.txt");
 	Grid = ParseGridDataFromFile(FilePath);
+
+	std::vector<GridLocation> Path = GetPath(Grid, Grid[0][0], Grid[Grid.size()-1][Grid[0].size()-1]);
+
+	for (GridLocation GridLocation: Path)
+	{
+		m_params.path.Push(GridLocation.Location);
+	}
+
+	
+	ReadParams("params.xml", m_params);
+	//ReadPath("path.xml", m_params);
+	ReadObstacles("obstacles.xml", m_params);
 }
 
 
@@ -45,8 +54,6 @@ void AAICharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	DrawDebug();
-
-	DrawGridDebugCircles();
 }
 
 
@@ -209,7 +216,7 @@ void AAICharacter::RotateCharacter(float DeltaTime)
 }
 
 
-void AAICharacter::DrawDebug()
+void AAICharacter::DrawDebug() const
 {
 	TArray<FVector> Points = m_params.path;
 
@@ -224,10 +231,12 @@ void AAICharacter::DrawDebug()
 	// 	temp.Y = 0.f;
 	// 	SetCircle(this, ObstaclesArray[i], temp, radius);
 	// }
+	
 	FVector dir(cos(FMath::DegreesToRadians(m_params.targetRotation)), 0.0f, sin(FMath::DegreesToRadians(m_params.targetRotation)));
 	//SetArrow(this, TEXT("targetRotation"), dir, 80.0f);
 
 	SetCircle(this, "targetPosition", m_params.targetPosition, 20.f);
+	DrawGridDebugCircles(); // pathfinding debug
 }
 
 
@@ -256,12 +265,12 @@ void AAICharacter::DrawGridDebugCircles() const
 {
 	const float CircleRadius = 20.f; // Adjust this radius according to your needs
 
-	for (int32 RowIndex = 0; RowIndex < Grid.Num(); ++RowIndex)
+	for (int32 RowIndex = 0; RowIndex < Grid.size(); ++RowIndex)
 	{
-		for (int32 ColIndex = 0; ColIndex < Grid[RowIndex].Num(); ++ColIndex)
+		for (int32 ColIndex = 0; ColIndex < Grid[RowIndex].size(); ++ColIndex)
 		{
 			const FVector Location = FVector(Grid[RowIndex][ColIndex].Location.X, 0.f, Grid[RowIndex][ColIndex].Location.Z);
-
+			
 			// Calculate rotation to align the circle with the X-Z plane
 			const FRotator Rotation = FRotator(0.f, 90.f, 0.f);
 

@@ -62,7 +62,7 @@ public:
 	float GetActorAngle() const;
 	void SetActorAngle(float angle);
 
-	void DrawDebug();
+	void DrawDebug() const;
 	void DrawGridDebugCircles() const;
 
 public:
@@ -72,6 +72,6 @@ public:
 	steering* m_steering = nullptr;
 	steering* m_angularSteering = nullptr;
 
-	TArray<TArray<GridLocation>> Grid;
+	std::vector<std::vector<GridLocation>> Grid;
 };
 

@@ -7,9 +7,11 @@ struct GridLocation
 {
     FVector Location;
     float EntryCost;
+    int IdX;
+    int IdZ;
 };
 
-TArray<TArray<GridLocation>> ParseGridDataFromFile(const FString& FilePath);
+std::vector<std::vector<GridLocation>> ParseGridDataFromFile(const FString& FilePath);
 
 
 #endif

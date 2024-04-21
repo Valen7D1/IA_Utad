@@ -3,9 +3,9 @@
 #include "Misc/Paths.h"
 
 
-TArray<TArray<GridLocation>> ParseGridDataFromFile(const FString& FilePath)
+std::vector<std::vector<GridLocation>> ParseGridDataFromFile(const FString& FilePath)
 {
-	TArray<TArray<GridLocation>> ParsedGrid;
+	std::vector<std::vector<GridLocation>> ParsedGrid;
 
 	// Read file contents
 	FString FileContents;
@@ -15,12 +15,15 @@ TArray<TArray<GridLocation>> ParseGridDataFromFile(const FString& FilePath)
 	TArray<FString> Lines;
 	FileContents.ParseIntoArrayLines(Lines);
 
+	int IdX = 0;
+	int IdZ = 0;
+	
 	for (const FString& Line : Lines)
 	{
 		TArray<FString> Elements;
 		Line.ParseIntoArray(Elements, TEXT(";"));
-
-		TArray<GridLocation> Row;
+		
+		std::vector<GridLocation> Row;
 		for (const FString& Element : Elements)
 		{
 			TArray<FString> Values;
@@ -33,10 +36,16 @@ TArray<TArray<GridLocation>> ParseGridDataFromFile(const FString& FilePath)
 				Location.Location.Y = FCString::Atof(*Values[1]);
 				Location.Location.Z = FCString::Atof(*Values[2]);
 				Location.EntryCost = FCString::Atof(*Values[3]);
-				Row.Add(Location);
+				Location.IdX = IdX;
+				Location.IdZ = IdZ;
+				Row.push_back(Location);
 			}
+			++IdZ;
 		}
-		ParsedGrid.Add(Row);
+		ParsedGrid.push_back(Row);
+		
+		++IdX;
+		IdZ = 0;
 	}
 
 	return ParsedGrid;
