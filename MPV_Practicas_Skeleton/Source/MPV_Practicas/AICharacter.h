@@ -6,7 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "params/params.h"
 #include "GameFramework/PlayerController.h"
-
+#include "data/data.h"
 #include "AICharacter.generated.h"
 
 
@@ -63,6 +63,7 @@ public:
 	void SetActorAngle(float angle);
 
 	void DrawDebug();
+	void DrawGridDebugCircles() const;
 
 public:
 	FVector m_velocity;
@@ -70,5 +71,7 @@ public:
 
 	steering* m_steering = nullptr;
 	steering* m_angularSteering = nullptr;
+
+	TArray<TArray<GridLocation>> Grid;
 };
 

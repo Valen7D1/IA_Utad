@@ -6,14 +6,15 @@
 #include "debug/debugdraw.h"
 #include "steering.h"
 #include "util.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 AAICharacter::AAICharacter()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	//m_steering = new SeekSteering();
-	m_steering = new ArriveSteering();
+	m_steering = new SeekSteering();
+	//m_steering = new ArriveSteering();
 	m_angularSteering = new AllignSteering();
 }
 
@@ -27,12 +28,15 @@ void AAICharacter::BeginPlay()
 	ReadParams("params.xml", m_params);
 	ReadPath("path.xml", m_params);
 	ReadObstacles("obstacles.xml", m_params);
+
+	const FString FilePath = FPaths::ProjectContentDir() + TEXT("Grid.txt");
+	Grid = ParseGridDataFromFile(FilePath);
 }
 
 
 void AAICharacter::Tick(float DeltaTime)
 {
-	CollisionManager(DeltaTime);
+	//CollisionManager(DeltaTime);
 	MoveCharacter(DeltaTime);
 	RotateCharacter(DeltaTime);
 	
@@ -41,6 +45,8 @@ void AAICharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	DrawDebug();
+
+	DrawGridDebugCircles();
 }
 
 
@@ -178,7 +184,7 @@ void AAICharacter::SelectNextPathPosition(float DeltaTime)
 void AAICharacter::MoveCharacter(float DeltaTime)
 {
 
-	//SelectNextPathPosition(DeltaTime);
+	SelectNextPathPosition(DeltaTime);
 	
 	m_velocity += m_steering->GetSteering(this, m_params) * DeltaTime;;
 
@@ -210,14 +216,14 @@ void AAICharacter::DrawDebug()
 	SetPath(this, TEXT("follow_path"), TEXT("path"), m_params.path, 5.0f, PathMaterial);
 
 	// perdon por este draw debug que voy a hacer pero sinceramente la vida es dura
-	TArray<FString> ObstaclesArray; ObstaclesArray.Add(FString("Obstacle1")); ObstaclesArray.Add(FString("Obstacle2"));
-	for (int i = 0; i < m_params.obstacles.Num(); ++i)
-	{
-		FVector temp = m_params.obstacles[i];
-		float radius = temp.Y;
-		temp.Y = 0.f;
-		SetCircle(this, ObstaclesArray[i], temp, radius);
-	}
+	// TArray<FString> ObstaclesArray; ObstaclesArray.Add(FString("Obstacle1")); ObstaclesArray.Add(FString("Obstacle2"));
+	// for (int i = 0; i < m_params.obstacles.Num(); ++i)
+	// {
+	// 	FVector temp = m_params.obstacles[i];
+	// 	float radius = temp.Y;
+	// 	temp.Y = 0.f;
+	// 	SetCircle(this, ObstaclesArray[i], temp, radius);
+	// }
 	FVector dir(cos(FMath::DegreesToRadians(m_params.targetRotation)), 0.0f, sin(FMath::DegreesToRadians(m_params.targetRotation)));
 	//SetArrow(this, TEXT("targetRotation"), dir, 80.0f);
 
@@ -244,4 +250,31 @@ void AAICharacter::SetActorAngle(float angle)
 { 
 	FRotator newRot(angle, 0.f, 0.f);// = angle.Rotation();
 	SetActorRotation(newRot); 
+}
+
+void AAICharacter::DrawGridDebugCircles() const
+{
+	const float CircleRadius = 20.f; // Adjust this radius according to your needs
+
+	for (int32 RowIndex = 0; RowIndex < Grid.Num(); ++RowIndex)
+	{
+		for (int32 ColIndex = 0; ColIndex < Grid[RowIndex].Num(); ++ColIndex)
+		{
+			const FVector Location = FVector(Grid[RowIndex][ColIndex].Location.X, 0.f, Grid[RowIndex][ColIndex].Location.Z);
+
+			// Calculate rotation to align the circle with the X-Z plane
+			const FRotator Rotation = FRotator(0.f, 90.f, 0.f);
+
+			// Create transform combining location and rotation
+			const FTransform Transform = FTransform(Rotation, Location, FVector::OneVector);
+			if (Grid[RowIndex][ColIndex].EntryCost < 0)
+			{
+				DrawDebugCircle(GetWorld(), Transform.ToMatrixWithScale(), CircleRadius, 32, FColor::Red, false, -1, 0, 5.f);
+			}
+			else
+			{
+				DrawDebugCircle(GetWorld(), Transform.ToMatrixWithScale(), CircleRadius, 32, FColor::Green, false, -1, 0, 5.f);
+			}
+		}
+	}
 }
