@@ -276,13 +276,14 @@ void AAICharacter::DrawGridDebugCircles() const
 
 			// Create transform combining location and rotation
 			const FTransform Transform = FTransform(Rotation, Location, FVector::OneVector);
+			
 			if (Grid[RowIndex][ColIndex].EntryCost < 0)
 			{
-				DrawDebugCircle(GetWorld(), Transform.ToMatrixWithScale(), CircleRadius, 32, FColor::Red, false, -1, 0, 5.f);
+				DrawDebugCircle(GetWorld(), Transform.ToMatrixNoScale(), CircleRadius, 32, FColor::Red, false, -1, 0, 5.f);
 			}
 			else
 			{
-				DrawDebugCircle(GetWorld(), Transform.ToMatrixWithScale(), CircleRadius, 32, FColor::Green, false, -1, 0, 5.f);
+				DrawDebugCircle(GetWorld(), Transform.ToMatrixNoScale(), CircleRadius, 32, FColor::Green, false, -1, 0, 5.f);
 			}
 		}
 	}

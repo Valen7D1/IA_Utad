@@ -18,7 +18,8 @@ struct Node {
     float gCost, hCost;
     Node* parent;
 
-    Node(int _x, int _z, int _idx, int _idz, float _gCost, float _hCost, Node* _parent) : x(_x), z(_z), IdX(_idx), IdZ(_idz), gCost(_gCost), hCost(_hCost), parent(_parent) {}
+    Node(int _x, int _z, int _idx, int _idz, float _gCost, float _hCost, Node* _parent) : 
+    x(_x), z(_z), IdX(_idx), IdZ(_idz), gCost(_gCost), hCost(_hCost), parent(_parent) {}
 
     float fCost() const {
         return gCost + hCost;
