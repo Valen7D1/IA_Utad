@@ -191,10 +191,32 @@ void AAICharacter::SelectNextPathPosition(float DeltaTime)
 	
 }
 
+void AAICharacter::SelectNextPathPositionWonky(float DeltaTime)
+{
+	FVector PlayerLocation = GetActorLocation();
+	if (FVector::Dist(PlayerLocation, m_params.targetPosition) <= 10.f)
+	{
+		if (m_currentPathPoint == m_params.path.Num()-1)
+		{
+			m_currentPathPoint = 0;
+		}
+		else
+		{
+			m_currentPathPoint++;
+		}
+		m_params.targetPosition = m_params.path[m_currentPathPoint];
+	}
+	
+	FVector dir = (m_params.targetPosition - GetActorLocation()).GetSafeNormal();
+	float angle = FMath::RadiansToDegrees(atan2(dir.Z, dir.X));
+	m_params.targetRotation = angle;
+}
+
 void AAICharacter::MoveCharacter(float DeltaTime)
 {
 
-	SelectNextPathPosition(DeltaTime);
+	SelectNextPathPositionWonky(DeltaTime);
+	//SelectNextPathPosition(DeltaTime);
 	
 	m_velocity += m_steering->GetSteering(this, m_params) * DeltaTime;;
 

@@ -56,6 +56,8 @@ public:
 
 	void CollisionManager(float DeltaTime);
 	void SelectNextPathPosition(float DeltaTime);
+	void SelectNextPathPositionWonky(float DeltaTime);
+
 	void MoveCharacter(float DeltaTime);
 	void RotateCharacter(float DeltaTime);
 
@@ -73,5 +75,9 @@ public:
 	steering* m_angularSteering = nullptr;
 
 	std::vector<std::vector<GridLocation>> Grid;
+
+private:
+	int m_currentPathPoint = 0;
+	
 };
 
