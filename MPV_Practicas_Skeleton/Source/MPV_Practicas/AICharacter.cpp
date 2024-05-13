@@ -29,7 +29,10 @@ void AAICharacter::BeginPlay()
 	const FString FilePath = FPaths::ProjectContentDir() + TEXT("Grid.txt");
 	Grid = ParseGridDataFromFile(FilePath);
 
-	std::vector<GridLocation> Path = GetPath(Grid, Grid[0][0], Grid[Grid.size()-1][Grid[0].size()-1]);
+	GridLocation Start = Grid[0][0];
+	GridLocation Finish = Grid[5][9];
+
+	std::vector<GridLocation> Path = GetPath(Grid, Start, Finish);
 
 	for (GridLocation GridLocation: Path)
 	{

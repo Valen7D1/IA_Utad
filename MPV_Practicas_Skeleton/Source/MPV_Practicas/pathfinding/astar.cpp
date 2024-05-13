@@ -6,9 +6,21 @@ bool operator<(const Node& a, const Node& b) {
     return a.fCost() > b.fCost();
 }
 
+bool operator>(const Node& a, const Node& b) {
+    return a.fCost() < b.fCost();
+}
+
 bool operator==(const Node& a, const Node& b) {
     return a.IdX == b.IdX && a.IdZ == b.IdZ;
 }
+
+class Compare {
+public:
+    bool operator()(Node* below, Node* above)
+    {
+        return below->fCost() > above->fCost();
+    }
+};
 
 
 bool IsOnVisited(const Node* Current, std::vector<Node*>& Visited)
@@ -21,9 +33,9 @@ bool IsOnVisited(const Node* Current, std::vector<Node*>& Visited)
     return false;
 }
 
-bool IsOnOpenSet(const Node* Current, std::priority_queue<Node*>& OpenSet)
+bool IsOnOpenSet(const Node* Current, std::priority_queue<Node*, std::vector<Node*>, Compare>& OpenSet)
 {
-    std::priority_queue<Node*> tempOpenSet = OpenSet;
+   std::priority_queue<Node*, std::vector<Node*>, Compare> tempOpenSet = OpenSet;
 
     while (!tempOpenSet.empty()) {
         Node* node = tempOpenSet.top();
@@ -66,7 +78,9 @@ float Heuristic(const GridLocation& a, const GridLocation& b) {
 }
 
 std::vector<GridLocation> GetPath(const std::vector<std::vector<GridLocation>>& grid, const GridLocation& start, const GridLocation& end) {
-    std::priority_queue<Node*> openSet;
+    
+    std::priority_queue<Node*, std::vector<Node*>, Compare> openSet;
+    //std::priority_queue<Node*> openSet;
     std::vector<Node*> Visited;
 
     openSet.push(new Node(start.Location.X, start.Location.Z,start.IdX, start.IdZ, 0, Heuristic(start, end), nullptr));
