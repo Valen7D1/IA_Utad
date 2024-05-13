@@ -29,15 +29,15 @@ void AAICharacter::BeginPlay()
 	const FString FilePath = FPaths::ProjectContentDir() + TEXT("Grid.txt");
 	Grid = ParseGridDataFromFile(FilePath);
 
-	GridLocation Start = Grid[0][0];
-	GridLocation Finish = Grid[5][9];
-
-	std::vector<GridLocation> Path = GetPath(Grid, Start, Finish);
-
-	for (GridLocation GridLocation: Path)
-	{
-		m_params.path.Push(GridLocation.Location);
-	}
+	// GridLocation Start = Grid[0][0];
+	// GridLocation Finish = Grid[5][9];
+	//
+	// std::vector<GridLocation> Path = GetPath(Grid, Start, Finish);
+	//
+	// for (GridLocation GridLocation: Path)
+	// {
+	// 	m_params.path.Push(GridLocation.Location);
+	// }
 
 	
 	ReadParams("params.xml", m_params);
@@ -52,8 +52,6 @@ void AAICharacter::Tick(float DeltaTime)
 	MoveCharacter(DeltaTime);
 	RotateCharacter(DeltaTime);
 	
-	//GEngine->AddOnScreenDebugMessage(-1, 0.5f, FColor::Yellow, FString::Printf(TEXT("[%f, %f]"),current_angle , m_params.targetRotation));
-
 	Super::Tick(DeltaTime);
 
 	DrawDebug();
@@ -70,16 +68,24 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 void AAICharacter::OnClickedLeft(const FVector& mousePosition)
 {
 	SetActorLocation(mousePosition);
+	m_params.targetPosition = mousePosition;
+	m_start = GetClosest(mousePosition);
+	m_params.path.Empty();
 }
+
+
 
 
 void AAICharacter::OnClickedRight(const FVector& mousePosition)
 {
-	m_params.targetPosition = mousePosition;
-
-	FVector dir = (mousePosition - GetActorLocation()).GetSafeNormal();
-	float angle = FMath::RadiansToDegrees(atan2(dir.Z, dir.X));
-	m_params.targetRotation = angle;
+	m_end = GetClosest(mousePosition);
+	
+	std::vector<GridLocation> Path = GetPath(Grid, m_start, m_end);
+	
+	for (GridLocation GridLocation: Path)
+	{
+		m_params.path.Push(GridLocation.Location);
+	}
 }
 
 
@@ -193,23 +199,26 @@ void AAICharacter::SelectNextPathPosition(float DeltaTime)
 
 void AAICharacter::SelectNextPathPositionWonky(float DeltaTime)
 {
-	FVector PlayerLocation = GetActorLocation();
-	if (FVector::Dist(PlayerLocation, m_params.targetPosition) <= 10.f)
+	if (m_params.path.Num()>0)
 	{
-		if (m_currentPathPoint == m_params.path.Num()-1)
+		FVector PlayerLocation = GetActorLocation();
+		if (FVector::Dist(PlayerLocation, m_params.targetPosition) <= 10.f)
 		{
-			m_currentPathPoint = 0;
+			if (m_currentPathPoint == m_params.path.Num()-1)
+			{
+				m_currentPathPoint = 0;
+			}
+			else
+			{
+				m_currentPathPoint++;
+			}
+			m_params.targetPosition = m_params.path[m_currentPathPoint];
 		}
-		else
-		{
-			m_currentPathPoint++;
-		}
-		m_params.targetPosition = m_params.path[m_currentPathPoint];
-	}
 	
-	FVector dir = (m_params.targetPosition - GetActorLocation()).GetSafeNormal();
-	float angle = FMath::RadiansToDegrees(atan2(dir.Z, dir.X));
-	m_params.targetRotation = angle;
+		FVector dir = (m_params.targetPosition - GetActorLocation()).GetSafeNormal();
+		float angle = FMath::RadiansToDegrees(atan2(dir.Z, dir.X));
+		m_params.targetRotation = angle;
+	}
 }
 
 void AAICharacter::MoveCharacter(float DeltaTime)
@@ -312,4 +321,20 @@ void AAICharacter::DrawGridDebugCircles() const
 			}
 		}
 	}
+}
+
+GridLocation AAICharacter::GetClosest(FVector MousePosition)
+{
+	GridLocation TempGridLocation = Grid[0][0];
+	for (int i = 0; i< Grid.size(); ++i)
+	{
+		for (int j = 0; j< Grid[0].size(); ++j)
+		{
+			if (FVector::Dist(Grid[i][j].Location, MousePosition) < FVector::Dist(TempGridLocation.Location, MousePosition))
+			{
+				TempGridLocation = Grid[i][j];
+			}
+		}
+	}
+	return TempGridLocation;
 }

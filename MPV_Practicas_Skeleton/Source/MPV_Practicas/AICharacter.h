@@ -78,6 +78,10 @@ public:
 
 private:
 	int m_currentPathPoint = 0;
+	GridLocation m_start;
+	GridLocation m_end;
+
+	GridLocation GetClosest(FVector MousePosition);
 	
 };
 
